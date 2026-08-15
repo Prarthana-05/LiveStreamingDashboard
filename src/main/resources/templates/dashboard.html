@@ -18,11 +18,11 @@
 
     <div class="container">
 
-<span class="navbar-brand">
-Live Streaming Dashboard
-</span>
+        <span class="navbar-brand">
+            Live Streaming Dashboard
+        </span>
 
-        <a href="/add" class="btn btn-success">
+        <a th:href="@{/add}" class="btn btn-success">
             Add Stream
         </a>
 
@@ -116,7 +116,7 @@ Live Streaming Dashboard
     </h3>
 
 
-    <form action="/search" class="d-flex mb-3">
+    <form th:action="@{/search}" class="d-flex mb-3">
 
 
         <input
@@ -142,19 +142,19 @@ Live Streaming Dashboard
     </h3>
 
 
-    <a href="/status?value=online"
+    <a th:href="@{/status(value='online')}"
        class="btn btn-success">
         Online
     </a>
 
 
-    <a href="/status?value=offline"
+    <a th:href="@{/status(value='offline')}"
        class="btn btn-danger">
         Offline
     </a>
 
 
-    <a href="/"
+    <a th:href="@{/}"
        class="btn btn-secondary">
         All
     </a>
@@ -178,7 +178,7 @@ Live Streaming Dashboard
 
             ⚠
             <span th:text="${stream.streamName}">
-</span>
+            </span>
 
             is offline
 
