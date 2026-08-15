@@ -10,9 +10,7 @@
 
 </head>
 
-
 <body class="bg-light">
-
 
 <nav class="navbar navbar-dark bg-dark">
 
@@ -30,20 +28,13 @@
 
 </nav>
 
-
-
 <div class="container mt-4">
-
-
 
     <h2 class="mb-4">
         Dashboard Overview
     </h2>
 
-
-
     <div class="row">
-
 
         <div class="col-md-4">
 
@@ -62,8 +53,6 @@
 
         </div>
 
-
-
         <div class="col-md-4">
 
             <div class="card text-center shadow">
@@ -80,9 +69,6 @@
             </div>
 
         </div>
-
-
-
 
         <div class="col-md-4">
 
@@ -101,23 +87,15 @@
 
         </div>
 
-
     </div>
 
-
-
-
     <hr>
-
-
 
     <h3>
         Search Stream
     </h3>
 
-
-    <form th:action="@{/search}" class="d-flex mb-3">
-
+    <form th:action="@{/search}" method="get" class="d-flex mb-3">
 
         <input
                 class="form-control me-2"
@@ -125,56 +103,39 @@
                 name="name"
                 placeholder="Enter stream name">
 
-
-        <button class="btn btn-primary">
+        <button type="submit" class="btn btn-primary">
             Search
         </button>
 
-
     </form>
-
-
-
-
 
     <h3>
         Filter Status
     </h3>
-
 
     <a th:href="@{/status(value='online')}"
        class="btn btn-success">
         Online
     </a>
 
-
     <a th:href="@{/status(value='offline')}"
        class="btn btn-danger">
         Offline
     </a>
-
 
     <a th:href="@{/}"
        class="btn btn-secondary">
         All
     </a>
 
-
-
-
-
     <h3 class="mt-4">
         Alerts
     </h3>
 
+    <div th:each="stream : ${streams}">
 
-
-    <div th:each="stream:${streams}">
-
-
-        <div th:if="${stream.status=='offline'}"
+        <div th:if="${stream.status == 'offline'}"
              class="alert alert-danger">
-
 
             ⚠
             <span th:text="${stream.streamName}">
@@ -182,24 +143,15 @@
 
             is offline
 
-
         </div>
 
-
     </div>
-
-
-
-
 
     <h3>
         Stream Details
     </h3>
 
-
-
     <table class="table table-bordered table-striped">
-
 
         <tr class="table-dark">
 
@@ -212,45 +164,31 @@
 
         </tr>
 
-
-
-
-        <tr th:each="stream:${streams}">
-
+        <tr th:each="stream : ${streams}">
 
             <td th:text="${stream.id}">
             </td>
 
-
             <td th:text="${stream.streamName}">
             </td>
-
 
             <td th:text="${stream.channelName}">
             </td>
 
-
             <td th:text="${stream.status}">
             </td>
-
 
             <td th:text="${stream.quality}">
             </td>
 
-
             <td th:text="${stream.location}">
             </td>
 
-
         </tr>
-
 
     </table>
 
-
-
 </div>
-
 
 </body>
 
