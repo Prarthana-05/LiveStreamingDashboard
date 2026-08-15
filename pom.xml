@@ -11,6 +11,7 @@
     <groupId>com.prarthana</groupId>
     <artifactId>LiveStreamingDashboard</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
     <name>LiveStreamingDashboard</name>
     <description>LiveStreamingDashboard</description>
     <url/>
