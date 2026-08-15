@@ -32,12 +32,16 @@ pipeline {
         stage('Deploy to Tomcat') {
     steps {
         bat '''
-        dir "target"
+        echo ===== CHECK WAR =====
+        dir "target\\*.war"
+
+        echo ===== CHECK TOMCAT =====
         dir "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps"
-        copy /Y "target\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war" "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war"
+
+        echo ===== DEPLOY =====
+        copy /Y "target\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war" "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\"
         '''
     }
 }
-
     }
 }
