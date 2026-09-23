@@ -19,7 +19,6 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 bat '''
-                REM Clean old extracted directory if it exists to force Tomcat to re-extract
                 if exist "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT" (
                     rmdir /S /Q "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT"
                 )
