@@ -1,5 +1,4 @@
 pipeline {
-
     agent any
 
     stages {
@@ -22,6 +21,12 @@ pipeline {
                 bat '''
                 copy /Y "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\LiveStreamingDashboard\\target\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war" "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war"
                 '''
+            }
+        }
+
+        stage('Wait for Tomcat to redeploy') {
+            steps {
+                bat 'timeout /t 30 /nobreak'
             }
         }
 
@@ -55,7 +60,7 @@ pipeline {
                 docker stop livestream-dashboard-container || exit /b 0
                 docker rm livestream-dashboard-container || exit /b 0
 
-                docker run -d --name livestream-dashboard-container -p 8083:8082 livestream-dashboard:1.0
+                docker run -d --name livestream-dashboard-container -p 8083:8082 -e SPRING_PROFILES_ACTIVE=docker livestream-dashboard:1.0
                 '''
             }
         }
