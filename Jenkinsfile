@@ -13,19 +13,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                 bat 'mvn clean package -DskipTests'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                  bat 'mvn test -Dtest=LiveStreamingDashboardApplicationTests,SeleniumDashboardTest'
-            }
-        }
-
-        stage('Archive') {
-            steps {
-                archiveArtifacts artifacts: 'target/*.war'
+                bat 'mvn clean package -DskipTests'
             }
         }
 
@@ -34,6 +22,18 @@ pipeline {
                 bat '''
                 copy /Y "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\LiveStreamingDashboard\\target\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war" "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war"
                 '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                bat 'mvn test -Dtest=LiveStreamingDashboardApplicationTests,SeleniumDashboardTest'
+            }
+        }
+
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.war'
             }
         }
 
