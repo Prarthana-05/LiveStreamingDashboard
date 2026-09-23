@@ -11,13 +11,13 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,15 +27,23 @@ public class SeleniumDashboardTest implements TestWatcher {
 
     private WebDriver driver;
 
+    // FIX 1: Standalone Tomcat uses port 8080 by default, NOT 8082
     private final String BASE_URL =
-            "http://localhost:8082/LiveStreamingDashboard-0.0.1-SNAPSHOT";
+            "http://localhost:8080/LiveStreamingDashboard-0.0.1-SNAPSHOT";
 
     @BeforeEach
     void setUp() {
-        driver = new ChromeDriver();
+        // FIX 2: Enable headless mode so Jenkins can execute Chrome without a desktop session
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+
+        driver = new ChromeDriver(options);
     }
 
-    // Helper: scroll to element then click (avoids "element click intercepted")
     private void scrollAndClick(WebElement element) {
         ((JavascriptExecutor) driver)
                 .executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
@@ -44,106 +52,94 @@ public class SeleniumDashboardTest implements TestWatcher {
         element.click();
     }
 
-    // Test Case 1: Dashboard loads
     @Test
     void dashboardLoadsSuccessfully() {
-
         driver.get(BASE_URL + "/");
 
-        assertTrue(driver.getTitle()
-                .contains("Live Streaming Dashboard"));
-
-        assertTrue(driver.getPageSource()
-                .contains("Dashboard Overview"));
-    }
-
-    // Test Case 2: Add Stream page loads
-    @Test
-    void addStreamPageLoadsSuccessfully() {
-
-        driver.get(BASE_URL + "/add");
-
-        assertTrue(driver.getTitle()
-                .contains("Add Stream"));
-
-        assertTrue(driver.getPageSource()
-                .contains("Add New Stream"));
-    }
-
-    // Test Case 3: Add a new stream
-    @Test
-    void addNewStreamSuccessfully() {
-
-        driver.get(BASE_URL + "/add");
-
-        driver.findElement(By.name("streamName"))
-                .sendKeys("Selenium Test Stream");
-
-        driver.findElement(By.name("channelName"))
-                .sendKeys("Test Channel");
-
-        driver.findElement(By.name("status"))
-                .sendKeys("online");
-
-        driver.findElement(By.name("quality"))
-                .sendKeys("HD");
-
-        driver.findElement(By.name("location"))
-                .sendKeys("Mumbai");
-
-        WebElement submitBtn = driver.findElement(
-                By.cssSelector("button[type='submit']"));
-        scrollAndClick(submitBtn);
-
-        new WebDriverWait(driver, Duration.ofSeconds(5))
+        new WebDriverWait(driver, Duration.ofSeconds(10))
                 .until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
 
-        assertTrue(driver.getPageSource()
-                .contains("Selenium Test Stream"));
+        assertTrue(driver.getTitle().contains("Live Streaming Dashboard"),
+                "Title did not match. Current title: " + driver.getTitle() + ", URL: " + driver.getCurrentUrl());
+
+        assertTrue(driver.getPageSource().contains("Dashboard Overview"));
     }
 
-    // Test Case 4: Search stream
+    @Test
+    void addStreamPageLoadsSuccessfully() {
+        driver.get(BASE_URL + "/add");
+
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+
+        assertTrue(driver.getTitle().contains("Add Stream"),
+                "Title did not match. Current title: " + driver.getTitle() + ", URL: " + driver.getCurrentUrl());
+
+        assertTrue(driver.getPageSource().contains("Add New Stream"));
+    }
+
+    @Test
+    void addNewStreamSuccessfully() {
+        driver.get(BASE_URL + "/add");
+
+        // FIX 3: Explicit wait to make sure form input is actually loaded before interacting
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement streamNameInput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("streamName"))
+        );
+
+        streamNameInput.sendKeys("Selenium Test Stream");
+        driver.findElement(By.name("channelName")).sendKeys("Test Channel");
+        driver.findElement(By.name("status")).sendKeys("online");
+        driver.findElement(By.name("quality")).sendKeys("HD");
+        driver.findElement(By.name("location")).sendKeys("Mumbai");
+
+        WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
+        scrollAndClick(submitBtn);
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+
+        assertTrue(driver.getPageSource().contains("Selenium Test Stream"));
+    }
+
     @Test
     void searchStreamWorks() {
-
-        // Ensure the stream exists before searching for it
         addNewStreamSuccessfully();
 
         driver.get(BASE_URL + "/");
 
-        driver.findElement(By.name("name"))
-                .sendKeys("Selenium Test Stream");
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement nameInput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("name"))
+        );
 
-        WebElement submitBtn = driver.findElement(
-                By.cssSelector("button[type='submit']"));
+        nameInput.sendKeys("Selenium Test Stream");
+
+        WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
         scrollAndClick(submitBtn);
 
-        new WebDriverWait(driver, Duration.ofSeconds(5))
-                .until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
 
-        assertTrue(driver.getPageSource()
-                .contains("Selenium Test Stream"));
+        assertTrue(driver.getPageSource().contains("Selenium Test Stream"));
     }
 
-    // Test Case 5: Online status filter
     @Test
     void onlineFilterWorks() {
-
         driver.get(BASE_URL + "/status?value=online");
 
-        assertTrue(driver.getPageSource()
-                .contains("online"));
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.presenceOfElementLocated(By.tagName("body")));
+
+        assertTrue(driver.getPageSource().contains("online"));
     }
 
     @AfterEach
     void tearDown() {
-
         if (driver != null) {
             driver.quit();
         }
     }
 
-    // Captures a screenshot automatically when a test fails
     @Override
     public void testFailed(ExtensionContext context, Throwable cause) {
         if (driver != null) {

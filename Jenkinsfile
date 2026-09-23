@@ -6,7 +6,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main',
-                url: 'https://github.com/Prarthana-05/LiveStreamingDashboard'
+                    url: 'https://github.com/Prarthana-05/LiveStreamingDashboard'
             }
         }
 
@@ -19,7 +19,11 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 bat '''
-                copy /Y "C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\LiveStreamingDashboard\\target\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war" "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war"
+                REM Clean old extracted directory if it exists to force Tomcat to re-extract
+                if exist "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT" (
+                    rmdir /S /Q "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT"
+                )
+                copy /Y "target\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war" "C:\\Users\\alpha\\Downloads\\apache-tomcat-10.1.57-windows-x64\\apache-tomcat-10.1.57\\webapps\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war"
                 '''
             }
         }
@@ -46,9 +50,7 @@ pipeline {
             steps {
                 bat '''
                 copy /Y "target\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war" "C:\\Users\\alpha\\Downloads\\LiveStreamingDocker\\LiveStreamingDashboard-0.0.1-SNAPSHOT.war"
-
                 cd /d "C:\\Users\\alpha\\Downloads\\LiveStreamingDocker"
-
                 docker build -t livestream-dashboard:1.0 .
                 '''
             }
@@ -59,7 +61,6 @@ pipeline {
                 bat '''
                 docker stop livestream-dashboard-container || exit /b 0
                 docker rm livestream-dashboard-container || exit /b 0
-
                 docker run -d --name livestream-dashboard-container -p 8083:8082 -e SPRING_PROFILES_ACTIVE=docker livestream-dashboard:1.0
                 '''
             }
