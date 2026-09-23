@@ -19,7 +19,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                 bat 'mvn test -Dtest=LiveStreamingDashboardApplicationTests'
+                  bat 'mvn test -Dtest=LiveStreamingDashboardApplicationTests,SeleniumDashboardTest'
             }
         }
 
