@@ -65,13 +65,17 @@ public class SeleniumDashboardTest implements TestWatcher {
     }
 
     // Test Case 2: Add Stream page loads via UI button
+    // Test Case 2: Add Stream page loads via UI button
     @Test
     void addStreamPageLoadsSuccessfully() {
         driver.get(BASE_URL + "/");
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        // Use partialLinkText or normalize-space to ignore HTML whitespace/newlines
         WebElement addStreamBtn = wait.until(
-                ExpectedConditions.elementToBeClickable(By.xpath("//a[contains(text(),'Add Stream')] | //button[contains(text(),'Add Stream')]"))
+                ExpectedConditions.elementToBeClickable(
+                        By.xpath("//*[contains(normalize-space(.), 'Add Stream') and (self::a or self::button)]")
+                )
         );
         scrollAndClick(addStreamBtn);
 
@@ -88,7 +92,9 @@ public class SeleniumDashboardTest implements TestWatcher {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         WebElement addStreamBtn = wait.until(
-                ExpectedConditions.elementToBeClickable(By.xpath("//a[contains(text(),'Add Stream')] | //button[contains(text(),'Add Stream')]"))
+                ExpectedConditions.elementToBeClickable(
+                        By.xpath("//*[contains(normalize-space(.), 'Add Stream') and (self::a or self::button)]")
+                )
         );
         scrollAndClick(addStreamBtn);
 
@@ -118,7 +124,6 @@ public class SeleniumDashboardTest implements TestWatcher {
         driver.get(BASE_URL + "/");
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        // Supports input by placeholder, name, or generic text field
         WebElement searchInput = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
                         By.xpath("//input[contains(@placeholder,'stream name') or @name='streamName' or @name='name']")
@@ -129,7 +134,7 @@ public class SeleniumDashboardTest implements TestWatcher {
         searchInput.sendKeys("Selenium Test Stream");
 
         WebElement searchBtn = driver.findElement(
-                By.xpath("//button[contains(text(),'Search') or @type='submit']")
+                By.xpath("//button[contains(normalize-space(.), 'Search') or @type='submit']")
         );
         scrollAndClick(searchBtn);
 
