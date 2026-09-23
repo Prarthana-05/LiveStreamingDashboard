@@ -26,7 +26,7 @@ pipeline {
 
         stage('Wait for Tomcat to redeploy') {
             steps {
-                bat 'timeout /t 30 /nobreak'
+                sleep(time: 30, unit: 'SECONDS')
             }
         }
 
